@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 )
 
 type UserWrapper struct{}
@@ -21,22 +21,21 @@ func (w *UserWrapper) WrapMeta(page, size, count, total int, sort, order string)
 	}
 }
 
-func (w *UserWrapper) WrapList(meta *domain.Meta, data []*domain.User) *domain.List {
+func (w *UserWrapper) List(meta *domain.Meta, data []*domain.User) *domain.List {
 	return &domain.List{
 		Meta: meta,
 		Data: data,
 	}
 }
 
-func (w *UserWrapper) WrapDetail(data *domain.User) *domain.Detail {
+func (w *UserWrapper) Detail(data *domain.User) *domain.Detail {
 	return &domain.Detail{
 		Data: data,
 	}
 }
 
-func (w *UserWrapper) WrapError(err error) *domain.Error {
+func (w *UserWrapper) Error(err error) *domain.Error {
 	return &domain.Error{
-		Meta:  nil,
 		Error: err.Error(),
 	}
 }

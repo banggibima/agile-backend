@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -53,9 +53,9 @@ type UserChecker interface {
 
 type UserWrapper interface {
 	WrapMeta(page, size, count, total int, sort, order string) *domain.Meta
-	WrapList(meta *domain.Meta, data []*domain.User) *domain.List
-	WrapDetail(data *domain.User) *domain.Detail
-	WrapError(err error) *domain.Error
+	List(meta *domain.Meta, data []*domain.User) *domain.List
+	Detail(data *domain.User) *domain.Detail
+	Error(err error) *domain.Error
 }
 
 type UserHandler interface {

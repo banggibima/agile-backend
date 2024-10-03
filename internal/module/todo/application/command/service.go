@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/todo"
-	"github.com/banggibima/backend-agile/internal/module/todo/domain"
+	"github.com/banggibima/agile-backend/internal/module/todo"
+	"github.com/banggibima/agile-backend/internal/module/todo/domain"
 )
 
 type TodoCommandService struct {

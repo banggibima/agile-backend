@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 	_ "github.com/lib/pq"
 )
 

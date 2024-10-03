@@ -3,7 +3,7 @@ package logrus
 import (
 	"os"
 
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 	"github.com/sirupsen/logrus"
 )
 

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 )
 
 type JWTMiddleware struct {

@@ -4,16 +4,28 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/banggibima/backend-agile/config"
-	todocommand "github.com/banggibima/backend-agile/internal/module/todo/application/command"
-	todoquery "github.com/banggibima/backend-agile/internal/module/todo/application/query"
-	tododelivery "github.com/banggibima/backend-agile/internal/module/todo/delivery"
-	todopersistence "github.com/banggibima/backend-agile/internal/module/todo/infrastructure/persistence"
-	usercommand "github.com/banggibima/backend-agile/internal/module/user/application/command"
-	userquery "github.com/banggibima/backend-agile/internal/module/user/application/query"
-	userdelivery "github.com/banggibima/backend-agile/internal/module/user/delivery"
-	userpersistence "github.com/banggibima/backend-agile/internal/module/user/infrastructure/persistence"
-	"github.com/banggibima/backend-agile/internal/transport/middleware"
+	"github.com/banggibima/agile-backend/config"
+	postcommand "github.com/banggibima/agile-backend/internal/module/post/application/command"
+	postquery "github.com/banggibima/agile-backend/internal/module/post/application/query"
+	postdelivery "github.com/banggibima/agile-backend/internal/module/post/delivery"
+	postpersistence "github.com/banggibima/agile-backend/internal/module/post/infrastructure/persistence"
+	profilecommand "github.com/banggibima/agile-backend/internal/module/profile/application/command"
+	profilequery "github.com/banggibima/agile-backend/internal/module/profile/application/query"
+	profiledelivery "github.com/banggibima/agile-backend/internal/module/profile/delivery"
+	profilepersistence "github.com/banggibima/agile-backend/internal/module/profile/infrastructure/persistence"
+	tagcommand "github.com/banggibima/agile-backend/internal/module/tag/application/command"
+	tagquery "github.com/banggibima/agile-backend/internal/module/tag/application/query"
+	tagdelivery "github.com/banggibima/agile-backend/internal/module/tag/delivery"
+	tagpersistence "github.com/banggibima/agile-backend/internal/module/tag/infrastructure/persistence"
+	todocommand "github.com/banggibima/agile-backend/internal/module/todo/application/command"
+	todoquery "github.com/banggibima/agile-backend/internal/module/todo/application/query"
+	tododelivery "github.com/banggibima/agile-backend/internal/module/todo/delivery"
+	todopersistence "github.com/banggibima/agile-backend/internal/module/todo/infrastructure/persistence"
+	usercommand "github.com/banggibima/agile-backend/internal/module/user/application/command"
+	userquery "github.com/banggibima/agile-backend/internal/module/user/application/query"
+	userdelivery "github.com/banggibima/agile-backend/internal/module/user/delivery"
+	userpersistence "github.com/banggibima/agile-backend/internal/module/user/infrastructure/persistence"
+	"github.com/banggibima/agile-backend/internal/transport/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -40,6 +52,36 @@ func NewHTTP(
 }
 
 func (h *HTTP) Set() error {
+	postPostgresRepository := postpersistence.NewPostPostgresRepository(h.Postgres)
+	postCommandService := postcommand.NewPostCommandService(postPostgresRepository)
+	postCommandUsecase := postcommand.NewPostCommandUsecase(postCommandService)
+	postQueryService := postquery.NewPostQueryService(postPostgresRepository)
+	postQueryUsecase := postquery.NewPostQueryUsecase(postQueryService)
+	postChecker := postdelivery.NewPostChecker()
+	postWrapper := postdelivery.NewPostWrapper()
+	postHandler := postdelivery.NewPostHandler(postCommandUsecase, postQueryUsecase, postChecker, postWrapper)
+	postRouter := postdelivery.NewPostRouter(h.Echo, postHandler)
+
+	profilePostgresRepository := profilepersistence.NewProfilePostgresRepository(h.Postgres)
+	profileCommandService := profilecommand.NewProfileCommandService(profilePostgresRepository)
+	profileCommandUsecase := profilecommand.NewProfileCommandUsecase(profileCommandService)
+	profileQueryService := profilequery.NewProfileQueryService(profilePostgresRepository)
+	profileQueryUsecase := profilequery.NewProfileQueryUsecase(profileQueryService)
+	profileChecker := profiledelivery.NewProfileChecker()
+	profileWrapper := profiledelivery.NewProfileWrapper()
+	profileHandler := profiledelivery.NewProfileHandler(profileCommandUsecase, profileQueryUsecase, profileChecker, profileWrapper)
+	profileRouter := profiledelivery.NewProfileRouter(h.Echo, profileHandler)
+
+	tagPostgresRepository := tagpersistence.NewTagPostgresRepository(h.Postgres)
+	tagCommandService := tagcommand.NewTagCommandService(tagPostgresRepository)
+	tagCommandUsecase := tagcommand.NewTagCommandUsecase(tagCommandService)
+	tagQueryService := tagquery.NewTagQueryService(tagPostgresRepository)
+	tagQueryUsecase := tagquery.NewTagQueryUsecase(tagQueryService)
+	tagChecker := tagdelivery.NewTagChecker()
+	tagWrapper := tagdelivery.NewTagWrapper()
+	tagHandler := tagdelivery.NewTagHandler(tagCommandUsecase, tagQueryUsecase, tagChecker, tagWrapper)
+	tagRouter := tagdelivery.NewTagRouter(h.Echo, tagHandler)
+
 	todoPostgresRepository := todopersistence.NewTodoPostgresRepository(h.Postgres)
 	todoCommandService := todocommand.NewTodoCommandService(todoPostgresRepository)
 	todoCommandUsecase := todocommand.NewTodoCommandUsecase(todoCommandService)
@@ -66,6 +108,9 @@ func (h *HTTP) Set() error {
 	h.Echo.Use(loggerMiddleware.WithConfig())
 	h.Echo.Use(corsMiddleware.WithConfig())
 
+	postRouter.Resource()
+	profileRouter.Resource()
+	tagRouter.Resource()
 	todoRouter.Resource()
 	userRouter.Resource()
 

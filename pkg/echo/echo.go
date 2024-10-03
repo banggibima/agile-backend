@@ -3,7 +3,7 @@ package echo
 import (
 	"io"
 
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 	"github.com/labstack/echo/v4"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -48,7 +48,7 @@ func (r *UserPostgresRepository) Find(offset, limit int, sort, order string) ([]
 	query := "SELECT id, username, password, role, status, created_at, updated_at FROM users"
 
 	if sort != "" && order != "" {
-		query += " ORDER BY " + sort + " " + order
+		query += " ORDER BY " + sort + " " + strings.ToUpper(order)
 	} else {
 		query += " ORDER BY created_at DESC"
 	}

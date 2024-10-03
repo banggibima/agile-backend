@@ -1,7 +1,7 @@
 package todo
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/todo/domain"
+	"github.com/banggibima/agile-backend/internal/module/todo/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -53,9 +53,9 @@ type TodoChecker interface {
 
 type TodoWrapper interface {
 	WrapMeta(page, size, count, total int, sort, order string) *domain.Meta
-	WrapList(meta *domain.Meta, data []*domain.Todo) *domain.List
-	WrapDetail(data *domain.Todo) *domain.Detail
-	WrapError(err error) *domain.Error
+	List(meta *domain.Meta, data []*domain.Todo) *domain.List
+	Detail(data *domain.Todo) *domain.Detail
+	Error(err error) *domain.Error
 }
 
 type TodoHandler interface {

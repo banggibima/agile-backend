@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/user"
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 )
 
 type UserCommandService struct {

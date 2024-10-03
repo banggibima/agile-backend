@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

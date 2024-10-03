@@ -3,7 +3,7 @@ package delivery
 import (
 	"strconv"
 
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/banggibima/backend-agile/internal/module/todo/domain"
+	"github.com/banggibima/agile-backend/internal/module/todo/domain"
 	"github.com/google/uuid"
 )
 
@@ -47,7 +47,7 @@ func (r *TodoPostgresRepository) Find(offset, limit int, sort, order string) ([]
 	query := "SELECT id, title, caption, created_at, updated_at FROM todos"
 
 	if sort != "" && order != "" {
-		query += " ORDER BY " + sort + " " + order
+		query += " ORDER BY " + sort + " " + strings.ToUpper(order)
 	} else {
 		query += " ORDER BY created_at DESC"
 	}
@@ -94,6 +94,7 @@ func (r *TodoPostgresRepository) Find(offset, limit int, sort, order string) ([]
 			return nil, err
 		}
 	} else {
+
 		result := make(chan []*domain.Todo)
 		error := make(chan error)
 

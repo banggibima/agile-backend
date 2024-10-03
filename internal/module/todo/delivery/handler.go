@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/banggibima/backend-agile/internal/module/todo"
-	"github.com/banggibima/backend-agile/internal/module/todo/domain"
+	"github.com/banggibima/agile-backend/internal/module/todo"
+	"github.com/banggibima/agile-backend/internal/module/todo/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -75,12 +75,12 @@ func (h *TodoHandler) Find(c echo.Context) error {
 
 	total, err := h.TodoQueryUsecase.Count()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	data, err := h.TodoQueryUsecase.Find(page, size, sort, order)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	meta.Total = total
@@ -88,7 +88,7 @@ func (h *TodoHandler) Find(c echo.Context) error {
 
 	meta = h.TodoWrapper.WrapMeta(meta.Page, meta.Size, meta.Count, meta.Total, meta.Sort, meta.Order)
 
-	return c.JSON(http.StatusOK, h.TodoWrapper.WrapList(meta, data))
+	return c.JSON(http.StatusOK, h.TodoWrapper.List(meta, data))
 }
 
 func (h *TodoHandler) FindByID(c echo.Context) error {
@@ -96,41 +96,41 @@ func (h *TodoHandler) FindByID(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoChecker.FindByID(uuid); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	data, err := h.TodoQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TodoWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.TodoWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.TodoWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.TodoWrapper.Detail(data))
 }
 
 func (h *TodoHandler) Save(c echo.Context) error {
 	data := new(domain.Todo)
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoChecker.Save(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoCommandUsecase.Save(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusCreated, h.TodoWrapper.WrapDetail(data))
+	return c.JSON(http.StatusCreated, h.TodoWrapper.Detail(data))
 }
 
 func (h *TodoHandler) Edit(c echo.Context) error {
@@ -139,33 +139,33 @@ func (h *TodoHandler) Edit(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	exist, err := h.TodoQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TodoWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.TodoWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoChecker.Edit(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoCommandUsecase.Edit(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.TodoWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.TodoWrapper.Detail(data))
 }
 
 func (h *TodoHandler) EditPartial(c echo.Context) error {
@@ -174,33 +174,33 @@ func (h *TodoHandler) EditPartial(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	exist, err := h.TodoQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TodoWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.TodoWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoChecker.EditPartial(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoCommandUsecase.EditPartial(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.TodoWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.TodoWrapper.Detail(data))
 }
 
 func (h *TodoHandler) Remove(c echo.Context) error {
@@ -209,26 +209,26 @@ func (h *TodoHandler) Remove(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	exist, err := h.TodoQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TodoWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.TodoWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := h.TodoChecker.Remove(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.TodoWrapper.Error(err))
 	}
 
 	if err := h.TodoCommandUsecase.Remove(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.Error(err))
 	}
 
 	return c.JSON(http.StatusNoContent, nil)

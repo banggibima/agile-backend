@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"github.com/banggibima/backend-agile/config"
+	"github.com/banggibima/agile-backend/config"
 	"github.com/redis/go-redis/v9"
 )
 

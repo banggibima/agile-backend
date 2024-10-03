@@ -1,7 +1,7 @@
 package delivery
 
 import (
-	"github.com/banggibima/backend-agile/internal/module/user"
+	"github.com/banggibima/agile-backend/internal/module/user"
 	"github.com/labstack/echo/v4"
 )
 

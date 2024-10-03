@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/banggibima/backend-agile/config"
-	"github.com/banggibima/backend-agile/internal/transport/http"
-	"github.com/banggibima/backend-agile/pkg/echo"
-	"github.com/banggibima/backend-agile/pkg/logrus"
-	"github.com/banggibima/backend-agile/pkg/postgres"
-	"github.com/banggibima/backend-agile/pkg/viper"
+	"github.com/banggibima/agile-backend/config"
+	"github.com/banggibima/agile-backend/internal/transport/http"
+	"github.com/banggibima/agile-backend/pkg/echo"
+	"github.com/banggibima/agile-backend/pkg/logrus"
+	"github.com/banggibima/agile-backend/pkg/postgres"
+	"github.com/banggibima/agile-backend/pkg/viper"
 )
 
 func main() {

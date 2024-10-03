@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/banggibima/backend-agile/internal/module/user"
-	"github.com/banggibima/backend-agile/internal/module/user/domain"
+	"github.com/banggibima/agile-backend/internal/module/user"
+	"github.com/banggibima/agile-backend/internal/module/user/domain"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -75,12 +75,12 @@ func (h *UserHandler) Find(c echo.Context) error {
 
 	total, err := h.UserQueryUsecase.Count()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	data, err := h.UserQueryUsecase.Find(page, size, sort, order)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	meta.Total = total
@@ -88,7 +88,7 @@ func (h *UserHandler) Find(c echo.Context) error {
 
 	meta = h.UserWrapper.WrapMeta(meta.Page, meta.Size, meta.Count, meta.Total, meta.Sort, meta.Order)
 
-	return c.JSON(http.StatusOK, h.UserWrapper.WrapList(meta, data))
+	return c.JSON(http.StatusOK, h.UserWrapper.List(meta, data))
 }
 
 func (h *UserHandler) FindByID(c echo.Context) error {
@@ -96,41 +96,41 @@ func (h *UserHandler) FindByID(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserChecker.FindByID(uuid); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	data, err := h.UserQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.UserWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.UserWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.UserWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.UserWrapper.Detail(data))
 }
 
 func (h *UserHandler) Save(c echo.Context) error {
 	data := new(domain.User)
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserChecker.Save(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserCommandUsecase.Save(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusCreated, h.UserWrapper.WrapDetail(data))
+	return c.JSON(http.StatusCreated, h.UserWrapper.Detail(data))
 }
 
 func (h *UserHandler) Edit(c echo.Context) error {
@@ -139,33 +139,33 @@ func (h *UserHandler) Edit(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	exist, err := h.UserQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.UserWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.UserWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserChecker.Edit(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserCommandUsecase.Edit(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.UserWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.UserWrapper.Detail(data))
 }
 
 func (h *UserHandler) EditPartial(c echo.Context) error {
@@ -174,33 +174,33 @@ func (h *UserHandler) EditPartial(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	exist, err := h.UserQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.UserWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.UserWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := c.Bind(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserChecker.EditPartial(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserCommandUsecase.EditPartial(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
-	return c.JSON(http.StatusOK, h.UserWrapper.WrapDetail(data))
+	return c.JSON(http.StatusOK, h.UserWrapper.Detail(data))
 }
 
 func (h *UserHandler) Remove(c echo.Context) error {
@@ -209,26 +209,26 @@ func (h *UserHandler) Remove(c echo.Context) error {
 
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	exist, err := h.UserQueryUsecase.FindByID(uuid)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.UserWrapper.WrapError(err))
+			return c.JSON(http.StatusNotFound, h.UserWrapper.Error(err))
 		}
 
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	data.ID = exist.ID
 
 	if err := h.UserChecker.Remove(data); err != nil {
-		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusBadRequest, h.UserWrapper.Error(err))
 	}
 
 	if err := h.UserCommandUsecase.Remove(data); err != nil {
-		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
+		return c.JSON(http.StatusInternalServerError, h.UserWrapper.Error(err))
 	}
 
 	return c.JSON(http.StatusNoContent, nil)

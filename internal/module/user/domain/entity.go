@@ -73,6 +73,5 @@ type Detail struct {
 }
 
 type Error struct {
-	Meta  *Meta       `json:"meta,omitempty"`
-	Error interface{} `json:"error,omitempty"`
+	Error interface{} `json:"error"`
 }
