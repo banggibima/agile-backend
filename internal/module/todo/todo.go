@@ -52,7 +52,7 @@ type TodoChecker interface {
 }
 
 type TodoWrapper interface {
-	WrapMeta(page, size, total int, sort, order string) *domain.Meta
+	WrapMeta(page, size, count, total int, sort, order string) *domain.Meta
 	WrapList(meta *domain.Meta, data []*domain.Todo) *domain.List
 	WrapDetail(data *domain.Todo) *domain.Detail
 	WrapError(err error) *domain.Error

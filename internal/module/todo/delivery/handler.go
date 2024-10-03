@@ -78,12 +78,15 @@ func (h *TodoHandler) Find(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
 	}
 
-	meta.Total = total
-
 	data, err := h.TodoQueryUsecase.Find(page, size, sort, order)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, h.TodoWrapper.WrapError(err))
 	}
+
+	meta.Total = total
+	meta.Count = len(data)
+
+	meta = h.TodoWrapper.WrapMeta(meta.Page, meta.Size, meta.Count, meta.Total, meta.Sort, meta.Order)
 
 	return c.JSON(http.StatusOK, h.TodoWrapper.WrapList(meta, data))
 }
@@ -149,8 +152,6 @@ func (h *TodoHandler) Edit(c echo.Context) error {
 	}
 
 	data.ID = exist.ID
-	data.CreatedAt = exist.CreatedAt
-	data.UpdatedAt = exist.UpdatedAt
 
 	if err := c.Bind(data); err != nil {
 		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))
@@ -186,10 +187,6 @@ func (h *TodoHandler) EditPartial(c echo.Context) error {
 	}
 
 	data.ID = exist.ID
-	data.Title = exist.Title
-	data.Caption = exist.Caption
-	data.CreatedAt = exist.CreatedAt
-	data.UpdatedAt = exist.UpdatedAt
 
 	if err := c.Bind(data); err != nil {
 		return c.JSON(http.StatusBadRequest, h.TodoWrapper.WrapError(err))

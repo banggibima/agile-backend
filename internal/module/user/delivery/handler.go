@@ -78,12 +78,15 @@ func (h *UserHandler) Find(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
 	}
 
-	meta.Total = total
-
 	data, err := h.UserQueryUsecase.Find(page, size, sort, order)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, h.UserWrapper.WrapError(err))
 	}
+
+	meta.Total = total
+	meta.Count = len(data)
+
+	meta = h.UserWrapper.WrapMeta(meta.Page, meta.Size, meta.Count, meta.Total, meta.Sort, meta.Order)
 
 	return c.JSON(http.StatusOK, h.UserWrapper.WrapList(meta, data))
 }
@@ -149,8 +152,6 @@ func (h *UserHandler) Edit(c echo.Context) error {
 	}
 
 	data.ID = exist.ID
-	data.CreatedAt = exist.CreatedAt
-	data.UpdatedAt = exist.UpdatedAt
 
 	if err := c.Bind(data); err != nil {
 		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))
@@ -186,12 +187,6 @@ func (h *UserHandler) EditPartial(c echo.Context) error {
 	}
 
 	data.ID = exist.ID
-	data.Username = exist.Username
-	data.Password = exist.Password
-	data.Role = exist.Role
-	data.Status = exist.Status
-	data.CreatedAt = exist.CreatedAt
-	data.UpdatedAt = exist.UpdatedAt
 
 	if err := c.Bind(data); err != nil {
 		return c.JSON(http.StatusBadRequest, h.UserWrapper.WrapError(err))

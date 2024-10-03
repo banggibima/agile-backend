@@ -25,6 +25,10 @@ func Client(config *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
+	if err := Migration(client); err != nil {
+		return nil, err
+	}
+
 	return client, nil
 }
 

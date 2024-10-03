@@ -2,6 +2,8 @@ package persistence
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/banggibima/backend-agile/internal/module/todo/domain"
@@ -163,7 +165,7 @@ func (r *TodoPostgresRepository) FindByID(id uuid.UUID) (*domain.Todo, error) {
 }
 
 func (r *TodoPostgresRepository) Save(payload *domain.Todo) error {
-	query := "INSERT INTO todos (id, title, caption, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO todos (id, title, caption, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id, title, caption, created_at, updated_at"
 
 	payload.ID = uuid.New()
 	payload.CreatedAt = time.Now()
@@ -173,12 +175,18 @@ func (r *TodoPostgresRepository) Save(payload *domain.Todo) error {
 	error := make(chan error)
 
 	go func() {
-		_, err := r.DB.Exec(
-			query, payload.ID,
+		err := r.DB.QueryRow(query,
+			payload.ID,
 			payload.Title,
 			payload.Caption,
 			payload.CreatedAt,
 			payload.UpdatedAt,
+		).Scan(
+			&payload.ID,
+			&payload.Title,
+			&payload.Caption,
+			&payload.CreatedAt,
+			&payload.UpdatedAt,
 		)
 		if err != nil {
 			error <- err
@@ -195,7 +203,7 @@ func (r *TodoPostgresRepository) Save(payload *domain.Todo) error {
 }
 
 func (r *TodoPostgresRepository) Edit(payload *domain.Todo) error {
-	query := "UPDATE todos SET title = $1, caption = $2, created_at = $3, updated_at = $4 WHERE id = $5"
+	query := "UPDATE todos SET title = $1, caption = $2, updated_at = $3 WHERE id = $4 RETURNING id, title, caption, created_at, updated_at"
 
 	payload.UpdatedAt = time.Now()
 
@@ -203,12 +211,17 @@ func (r *TodoPostgresRepository) Edit(payload *domain.Todo) error {
 	error := make(chan error)
 
 	go func() {
-		_, err := r.DB.Exec(query,
+		err := r.DB.QueryRow(query,
 			payload.Title,
 			payload.Caption,
-			payload.CreatedAt,
 			payload.UpdatedAt,
 			payload.ID,
+		).Scan(
+			&payload.ID,
+			&payload.Title,
+			&payload.Caption,
+			&payload.CreatedAt,
+			&payload.UpdatedAt,
 		)
 		if err != nil {
 			error <- err
@@ -225,20 +238,42 @@ func (r *TodoPostgresRepository) Edit(payload *domain.Todo) error {
 }
 
 func (r *TodoPostgresRepository) EditPartial(payload *domain.Todo) error {
-	query := "UPDATE todos SET title = $1, caption = $2, created_at = $3, updated_at = $4 WHERE id = $5"
+	query := "UPDATE todos SET "
+	args := []interface{}{}
+	clauses := []string{}
+
+	if payload.Title != "" {
+		clauses = append(clauses, "title = $"+strconv.Itoa(len(args)+1))
+		args = append(args, payload.Title)
+	}
+
+	if payload.Caption != "" {
+		clauses = append(clauses, "caption = $"+strconv.Itoa(len(args)+1))
+		args = append(args, payload.Caption)
+	}
 
 	payload.UpdatedAt = time.Now()
+
+	clauses = append(clauses, "updated_at = $"+strconv.Itoa(len(args)+1))
+	args = append(args, payload.UpdatedAt)
+
+	if len(clauses) == 0 {
+		return nil
+	}
+
+	query += strings.Join(clauses, ", ") + " WHERE id = $" + strconv.Itoa(len(args)+1) + " RETURNING id, title, caption, created_at, updated_at"
+	args = append(args, payload.ID)
 
 	result := make(chan error)
 	error := make(chan error)
 
 	go func() {
-		_, err := r.DB.Exec(query,
-			payload.Title,
-			payload.Caption,
-			payload.CreatedAt,
-			payload.UpdatedAt,
-			payload.ID,
+		err := r.DB.QueryRow(query, args...).Scan(
+			&payload.ID,
+			&payload.Title,
+			&payload.Caption,
+			&payload.CreatedAt,
+			&payload.UpdatedAt,
 		)
 		if err != nil {
 			error <- err

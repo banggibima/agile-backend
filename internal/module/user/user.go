@@ -52,7 +52,7 @@ type UserChecker interface {
 }
 
 type UserWrapper interface {
-	WrapMeta(page, size, total int, sort, order string) *domain.Meta
+	WrapMeta(page, size, count, total int, sort, order string) *domain.Meta
 	WrapList(meta *domain.Meta, data []*domain.User) *domain.List
 	WrapDetail(data *domain.User) *domain.Detail
 	WrapError(err error) *domain.Error

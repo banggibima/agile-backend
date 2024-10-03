@@ -39,49 +39,35 @@ func NewHTTP(
 	}
 }
 
-func (h *HTTP) TodoModule() {
-	postgresRepository := todopersistence.NewTodoPostgresRepository(h.Postgres)
-
-	commandService := todocommand.NewTodoCommandService(postgresRepository)
-	commandUsecase := todocommand.NewTodoCommandUsecase(commandService)
-
-	queryService := todoquery.NewTodoQueryService(postgresRepository)
-	queryUsecase := todoquery.NewTodoQueryUsecase(queryService)
-
-	checker := tododelivery.NewTodoChecker()
-	wrapper := tododelivery.NewTodoWrapper()
-	handler := tododelivery.NewTodoHandler(commandUsecase, queryUsecase, checker, wrapper)
-	router := tododelivery.NewTodoRouter(h.Echo, handler)
-
-	router.Resource()
-}
-
-func (h *HTTP) UserModule() {
-	postgresRepository := userpersistence.NewUserPostgresRepository(h.Postgres)
-
-	commandService := usercommand.NewUserCommandService(postgresRepository)
-	commandUsecase := usercommand.NewUserCommandUsecase(commandService)
-
-	queryService := userquery.NewUserQueryService(postgresRepository)
-	queryUsecase := userquery.NewUserQueryUsecase(queryService)
-
-	checker := userdelivery.NewUserChecker()
-	wrapper := userdelivery.NewUserWrapper()
-	handler := userdelivery.NewUserHandler(commandUsecase, queryUsecase, checker, wrapper)
-	router := userdelivery.NewUserRouter(h.Echo, handler)
-
-	router.Resource()
-}
-
 func (h *HTTP) Set() error {
-	h.TodoModule()
-	h.UserModule()
+	todoPostgresRepository := todopersistence.NewTodoPostgresRepository(h.Postgres)
+	todoCommandService := todocommand.NewTodoCommandService(todoPostgresRepository)
+	todoCommandUsecase := todocommand.NewTodoCommandUsecase(todoCommandService)
+	todoQueryService := todoquery.NewTodoQueryService(todoPostgresRepository)
+	todoQueryUsecase := todoquery.NewTodoQueryUsecase(todoQueryService)
+	todoChecker := tododelivery.NewTodoChecker()
+	todoWrapper := tododelivery.NewTodoWrapper()
+	todoHandler := tododelivery.NewTodoHandler(todoCommandUsecase, todoQueryUsecase, todoChecker, todoWrapper)
+	todoRouter := tododelivery.NewTodoRouter(h.Echo, todoHandler)
+
+	userPostgresRepository := userpersistence.NewUserPostgresRepository(h.Postgres)
+	userCommandService := usercommand.NewUserCommandService(userPostgresRepository)
+	userCommandUsecase := usercommand.NewUserCommandUsecase(userCommandService)
+	userQueryService := userquery.NewUserQueryService(userPostgresRepository)
+	userQueryUsecase := userquery.NewUserQueryUsecase(userQueryService)
+	userChecker := userdelivery.NewUserChecker()
+	userWrapper := userdelivery.NewUserWrapper()
+	userHandler := userdelivery.NewUserHandler(userCommandUsecase, userQueryUsecase, userChecker, userWrapper)
+	userRouter := userdelivery.NewUserRouter(h.Echo, userHandler)
 
 	loggerMiddleware := middleware.NewLoggerMiddleware(h.Config, h.Logger)
 	corsMiddleware := middleware.NewCORSMiddleware(h.Config)
 
 	h.Echo.Use(loggerMiddleware.WithConfig())
 	h.Echo.Use(corsMiddleware.WithConfig())
+
+	todoRouter.Resource()
+	userRouter.Resource()
 
 	return nil
 }

@@ -10,10 +10,11 @@ func NewTodoWrapper() *TodoWrapper {
 	return &TodoWrapper{}
 }
 
-func (w *TodoWrapper) WrapMeta(page, size, total int, sort, order string) *domain.Meta {
+func (w *TodoWrapper) WrapMeta(page, size, count, total int, sort, order string) *domain.Meta {
 	return &domain.Meta{
 		Page:  page,
 		Size:  size,
+		Count: count,
 		Total: total,
 		Sort:  sort,
 		Order: order,

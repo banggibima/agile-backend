@@ -57,6 +57,7 @@ type RemoveRequest struct {
 type Meta struct {
 	Page  int    `json:"page"`
 	Size  int    `json:"size"`
+	Count int    `json:"count"`
 	Total int    `json:"total"`
 	Sort  string `json:"sort"`
 	Order string `json:"order"`

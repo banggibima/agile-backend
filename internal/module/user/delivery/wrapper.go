@@ -10,10 +10,11 @@ func NewUserWrapper() *UserWrapper {
 	return &UserWrapper{}
 }
 
-func (w *UserWrapper) WrapMeta(page, size, total int, sort, order string) *domain.Meta {
+func (w *UserWrapper) WrapMeta(page, size, count, total int, sort, order string) *domain.Meta {
 	return &domain.Meta{
 		Page:  page,
 		Size:  size,
+		Count: count,
 		Total: total,
 		Sort:  sort,
 		Order: order,
