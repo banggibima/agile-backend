@@ -161,6 +161,9 @@ func (r *ProfilePostgresRepository) FindByID(id uuid.UUID) (*domain.Profile, err
 			&profile.UpdatedAt,
 		)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				result <- nil
+			}
 			error <- err
 		}
 		result <- &profile

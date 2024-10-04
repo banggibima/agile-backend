@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -105,11 +106,11 @@ func (h *TagHandler) FindByID(c echo.Context) error {
 
 	data, err := h.TagQueryUsecase.FindByID(uuid)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TagWrapper.Error(err))
-		}
-
 		return c.JSON(http.StatusInternalServerError, h.TagWrapper.Error(err))
+	}
+
+	if data == nil {
+		return c.JSON(http.StatusNotFound, h.TagWrapper.Error(errors.New("data not found")))
 	}
 
 	return c.JSON(http.StatusOK, h.TagWrapper.Detail(data))
@@ -144,11 +145,11 @@ func (h *TagHandler) Edit(c echo.Context) error {
 
 	exist, err := h.TagQueryUsecase.FindByID(uuid)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TagWrapper.Error(err))
-		}
-
 		return c.JSON(http.StatusInternalServerError, h.TagWrapper.Error(err))
+	}
+
+	if exist == nil {
+		return c.JSON(http.StatusNotFound, h.TagWrapper.Error(errors.New("data not found")))
 	}
 
 	data.ID = exist.ID
@@ -179,11 +180,11 @@ func (h *TagHandler) EditPartial(c echo.Context) error {
 
 	exist, err := h.TagQueryUsecase.FindByID(uuid)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TagWrapper.Error(err))
-		}
-
 		return c.JSON(http.StatusInternalServerError, h.TagWrapper.Error(err))
+	}
+
+	if exist == nil {
+		return c.JSON(http.StatusNotFound, h.TagWrapper.Error(errors.New("data not found")))
 	}
 
 	data.ID = exist.ID
@@ -214,11 +215,11 @@ func (h *TagHandler) Remove(c echo.Context) error {
 
 	exist, err := h.TagQueryUsecase.FindByID(uuid)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			return c.JSON(http.StatusNotFound, h.TagWrapper.Error(err))
-		}
-
 		return c.JSON(http.StatusInternalServerError, h.TagWrapper.Error(err))
+	}
+
+	if exist == nil {
+		return c.JSON(http.StatusNotFound, h.TagWrapper.Error(errors.New("data not found")))
 	}
 
 	data.ID = exist.ID

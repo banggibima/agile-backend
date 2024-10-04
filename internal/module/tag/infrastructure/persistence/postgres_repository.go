@@ -149,6 +149,9 @@ func (r *TagPostgresRepository) FindByID(id uuid.UUID) (*domain.Tag, error) {
 			&tag.UpdatedAt,
 		)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				result <- nil
+			}
 			error <- err
 		}
 		result <- &tag

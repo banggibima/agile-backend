@@ -155,6 +155,9 @@ func (r *PostPostgresRepository) FindByID(id uuid.UUID) (*domain.Post, error) {
 			&post.UpdatedAt,
 		)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				result <- nil
+			}
 			error <- err
 		}
 		result <- &post
