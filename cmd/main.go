@@ -15,31 +15,31 @@ func main() {
 		panic(err)
 	}
 
-	cfg, err := config.Get(v)
+	config, err := config.Get(v)
 	if err != nil {
 		panic(err)
 	}
 
-	log, err := logrus.Init(cfg)
+	logrus, err := logrus.Init(config)
 	if err != nil {
 		panic(err)
 	}
 
-	e, err := echo.Init(cfg)
+	echo, err := echo.Init(config)
 	if err != nil {
 		panic(err)
 	}
 
-	pq, err := postgres.Client(cfg)
+	postgres, err := postgres.Client(config)
 	if err != nil {
 		panic(err)
 	}
 
 	if err := http.NewHTTP(
-		cfg,
-		e,
-		log,
-		pq,
+		config,
+		echo,
+		logrus,
+		postgres,
 	).Start(); err != nil {
 		panic(err)
 	}

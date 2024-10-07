@@ -10,6 +10,8 @@ type Config struct {
 	Redis    Redis
 	JWT      JWT
 	Minio    Minio
+	Mongo    Mongo
+	RabbitMQ RabbitMQ
 }
 
 type App struct {
@@ -44,6 +46,14 @@ type Minio struct {
 	UseSSL          bool
 }
 
+type Mongo struct {
+	URI string
+}
+
+type RabbitMQ struct {
+	URL string
+}
+
 func Get(v *viper.Viper) (*Config, error) {
 	config := &Config{
 		App: App{
@@ -68,10 +78,16 @@ func Get(v *viper.Viper) (*Config, error) {
 			Issuer:        v.GetString("JWT_ISSUER"),
 		},
 		Minio: Minio{
-			Endpoint:        viper.GetString("MINIO_ENDPOINT"),
-			AccessKeyID:     viper.GetString("MINIO_ACCESS_KEY_ID"),
-			SecretAccessKey: viper.GetString("MINIO_SECRET_ACCESS_KEY"),
-			UseSSL:          viper.GetBool("MINIO_USE_SSL"),
+			Endpoint:        v.GetString("MINIO_ENDPOINT"),
+			AccessKeyID:     v.GetString("MINIO_ACCESS_KEY_ID"),
+			SecretAccessKey: v.GetString("MINIO_SECRET_ACCESS_KEY"),
+			UseSSL:          v.GetBool("MINIO_USE_SSL"),
+		},
+		Mongo: Mongo{
+			URI: v.GetString("MONGO_URI"),
+		},
+		RabbitMQ: RabbitMQ{
+			URL: v.GetString("RABBITMQ_URL"),
 		},
 	}
 
