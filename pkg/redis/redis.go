@@ -8,7 +8,7 @@ import (
 )
 
 func Client(config *config.Config) (*redis.Client, error) {
-	url := config.Redis.Url
+	url := config.Redis.URL
 
 	options, err := redis.ParseURL(url)
 	if err != nil {

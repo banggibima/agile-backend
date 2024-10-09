@@ -1,24 +1,102 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    depends_on:
-      - db
-
-  db:
-    image: postgres:13
+    container_name: be-app
     environment:
-      POSTGRES_USER: banggibima
-      POSTGRES_DB: agile_backend
+      - APP_NAME=${APP_NAME}
+      - APP_ENV=${APP_ENV}
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=${APP_DEBUG}
+      - APP_HOST=${APP_HOST}
+      - APP_PORT=${APP_PORT}
+      - POSTGRES_DRIVER=${POSTGRES_DRIVER}
+      - POSTGRES_URL=${POSTGRES_URL}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_SSLMODE=${POSTGRES_SSLMODE}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_ACCESS_EXPIRE=${JWT_ACCESS_EXPIRE}
+      - JWT_REFRESH_EXPIRE=${JWT_REFRESH_EXPIRE}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY_ID=${MINIO_ACCESS_KEY_ID}
+      - MINIO_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
+      - MINIO_USE_SSL=${MINIO_USE_SSL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+    build: .
     ports:
-      - "5432:5432"
+      - 8081:8080
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - .:/app
+    networks:
+      - default
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - rabbitmq
+
+  postgres:
+    container_name: be-postgres
+    image: postgres:16
+    environment:
+      - DATABASE_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+
+  redis:
+    container_name: be-redis
+    image: redis:7
+    ports:
+      - 6380:6379
+    networks:
+      - default
+
+  minio:
+    container_name: be-minio
+    image: minio/minio
+    command: server /data
+    ports:
+      - 9001:9000
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY_ID}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_ACCESS_KEY}
+    volumes:
+      - minio_data:/data
+    networks:
+      - default
+
+  rabbitmq:
+    container_name: be-rabbitmq
+    image: rabbitmq:3
+    ports:
+      - 5673:5672
+    networks:
+      - default
 
 volumes:
-  db_data:
+  postgres_data:
+  minio_data:
+
+networks:
+  default:
+    driver: bridge

@@ -9,11 +9,12 @@ import (
 
 	"github.com/banggibima/agile-backend/config"
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 )
 
-func Client(config *config.Config) (*sql.DB, error) {
+func Client(config *config.Config, logger *logrus.Logger) (*sql.DB, error) {
 	driver := config.Postgres.Driver
-	url := config.Postgres.Url
+	url := config.Postgres.URL
 	sslmode := config.Postgres.SSLMode
 
 	client, err := sql.Open(driver, url+"?sslmode="+sslmode)
@@ -25,7 +26,7 @@ func Client(config *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
-	if err := Migration(client); err != nil {
+	if err := Migration(client, logger); err != nil {
 		return nil, err
 	}
 
@@ -41,14 +42,8 @@ func Connect(client *sql.DB) error {
 	return nil
 }
 
-func Migration(db *sql.DB) error {
-	query := `
-		CREATE TABLE IF NOT EXISTS migrations (
-			id SERIAL PRIMARY KEY,
-			name VARCHAR(255),
-			applied_at TIMESTAMPTZ DEFAULT NOW()
-		)
-	`
+func Migration(db *sql.DB, logger *logrus.Logger) error {
+	query := "CREATE TABLE IF NOT EXISTS migrations (	id SERIAL PRIMARY KEY, name VARCHAR(255),	applied_at TIMESTAMPTZ DEFAULT NOW())"
 
 	_, err := db.Exec(query)
 	if err != nil {
@@ -66,11 +61,7 @@ func Migration(db *sql.DB) error {
 		}
 
 		count := 0
-		query = `
-			SELECT COUNT(*)
-			FROM migrations
-			WHERE name = $1
-		`
+		query = "SELECT COUNT(*) FROM migrations WHERE name = $1"
 
 		err := db.QueryRow(query, file.Name()).Scan(&count)
 		if err != nil {
@@ -92,23 +83,20 @@ func Migration(db *sql.DB) error {
 			return fmt.Errorf("failed to execute migration: %v", err)
 		}
 
-		query = `
-			INSERT INTO migrations (name)
-			VALUES ($1)
-		`
+		query = "INSERT INTO migrations (name) VALUES ($1)"
 
 		_, err = db.Exec(query, file.Name())
 		if err != nil {
 			return fmt.Errorf("failed to record migration: %v", err)
 		}
 
-		fmt.Printf("migration applied: %s\n", file.Name())
+		logger.Infof("migration applied: %s", file.Name())
 	}
 
 	return nil
 }
 
-func Seed(db *sql.DB) error {
+func Seed(db *sql.DB, logger *logrus.Logger) error {
 	files, err := os.ReadDir("seed")
 	if err != nil {
 		return fmt.Errorf("failed to read seed files: %v", err)
@@ -130,7 +118,7 @@ func Seed(db *sql.DB) error {
 			return fmt.Errorf("failed to execute seed: %v", err)
 		}
 
-		fmt.Printf("seed applied: %s\n", file.Name())
+		logger.Infof("seed applied: %s", file.Name())
 	}
 
 	return nil

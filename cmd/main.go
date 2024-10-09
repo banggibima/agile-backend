@@ -15,7 +15,7 @@ func main() {
 		panic(err)
 	}
 
-	config, err := config.Get(v)
+	config, err := config.Load(v)
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +30,7 @@ func main() {
 		panic(err)
 	}
 
-	postgres, err := postgres.Client(config)
+	postgres, err := postgres.Client(config, logrus)
 	if err != nil {
 		panic(err)
 	}

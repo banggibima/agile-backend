@@ -7,7 +7,7 @@ import (
 )
 
 func Connect(config *config.Config) (*mongo.Client, error) {
-	options := options.Client().ApplyURI(config.Mongo.URI)
+	options := options.Client().ApplyURI(config.Mongo.URL)
 
 	client, err := mongo.Connect(options)
 	if err != nil {

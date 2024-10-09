@@ -15,19 +15,30 @@ type Config struct {
 }
 
 type App struct {
-	Name    string
-	Port    int
-	Version string
+	Name  string
+	Env   string
+	Key   string
+	Debug bool
+	Host  string
+	Port  int
 }
 
 type Postgres struct {
-	Driver  string
-	Url     string
-	SSLMode string
+	Driver   string
+	URL      string
+	Host     string
+	Port     int
+	Username string
+	Password string
+	Database string
+	SSLMode  string
 }
 
 type Redis struct {
-	Url string
+	URL      string
+	Host     string
+	Password string
+	Port     int
 }
 
 type JWT struct {
@@ -47,27 +58,38 @@ type Minio struct {
 }
 
 type Mongo struct {
-	URI string
+	URL string
 }
 
 type RabbitMQ struct {
 	URL string
 }
 
-func Get(v *viper.Viper) (*Config, error) {
+func Load(v *viper.Viper) (*Config, error) {
 	config := &Config{
 		App: App{
-			Name:    v.GetString("APP_NAME"),
-			Port:    v.GetInt("APP_PORT"),
-			Version: v.GetString("APP_VERSION"),
+			Name:  v.GetString("APP_NAME"),
+			Env:   v.GetString("APP_ENV"),
+			Key:   v.GetString("APP_KEY"),
+			Debug: v.GetBool("APP_DEBUG"),
+			Host:  v.GetString("APP_HOST"),
+			Port:  v.GetInt("APP_PORT"),
 		},
 		Postgres: Postgres{
-			Driver:  v.GetString("POSTGRES_DRIVER"),
-			Url:     v.GetString("POSTGRES_URL"),
-			SSLMode: v.GetString("POSTGRES_SSLMODE"),
+			Driver:   v.GetString("POSTGRES_DRIVER"),
+			URL:      v.GetString("POSTGRES_URL"),
+			Host:     v.GetString("POSTGRES_HOST"),
+			Port:     v.GetInt("POSTGRES_PORT"),
+			Username: v.GetString("POSTGRES_USERNAME"),
+			Password: v.GetString("POSTGRES_PASSWORD"),
+			Database: v.GetString("POSTGRES_DATABASE"),
+			SSLMode:  v.GetString("POSTGRES_SSLMODE"),
 		},
 		Redis: Redis{
-			Url: v.GetString("REDIS_URL"),
+			URL:      v.GetString("REDIS_URL"),
+			Host:     v.GetString("REDIS_HOST"),
+			Password: v.GetString("REDIS_PASSWORD"),
+			Port:     v.GetInt("REDIS_PORT"),
 		},
 		JWT: JWT{
 			AccessSecret:  v.GetString("JWT_ACCESS_SECRET"),
@@ -84,7 +106,7 @@ func Get(v *viper.Viper) (*Config, error) {
 			UseSSL:          v.GetBool("MINIO_USE_SSL"),
 		},
 		Mongo: Mongo{
-			URI: v.GetString("MONGO_URI"),
+			URL: v.GetString("MONGO_URL"),
 		},
 		RabbitMQ: RabbitMQ{
 			URL: v.GetString("RABBITMQ_URL"),

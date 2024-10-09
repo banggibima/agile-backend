@@ -1,20 +1,17 @@
 *.exe
-*.dll
-*.so
-*.dylib
-*.test
-
+*.exe~
 *.out
+*.test
+*.so
 
-vendor
-
-go.sum
-
-.vscode
-.idea
-*.swp
-*.swo
+vendor/
 
 .env
+
+.idea/
+.vscode/
+*.swp
+
+docker-compose.override.yml
 
 *.log
