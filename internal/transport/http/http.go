@@ -17,10 +17,6 @@ import (
 	tagquery "github.com/banggibima/agile-backend/internal/module/tag/application/query"
 	tagdelivery "github.com/banggibima/agile-backend/internal/module/tag/delivery"
 	tagpersistence "github.com/banggibima/agile-backend/internal/module/tag/infrastructure/persistence"
-	todocommand "github.com/banggibima/agile-backend/internal/module/todo/application/command"
-	todoquery "github.com/banggibima/agile-backend/internal/module/todo/application/query"
-	tododelivery "github.com/banggibima/agile-backend/internal/module/todo/delivery"
-	todopersistence "github.com/banggibima/agile-backend/internal/module/todo/infrastructure/persistence"
 	usercommand "github.com/banggibima/agile-backend/internal/module/user/application/command"
 	userquery "github.com/banggibima/agile-backend/internal/module/user/application/query"
 	userdelivery "github.com/banggibima/agile-backend/internal/module/user/delivery"
@@ -82,16 +78,6 @@ func (h *HTTP) Set() error {
 	tagHandler := tagdelivery.NewTagHandler(tagCommandUsecase, tagQueryUsecase, tagChecker, tagWrapper)
 	tagRouter := tagdelivery.NewTagRouter(h.Echo, tagHandler)
 
-	todoPostgresRepository := todopersistence.NewTodoPostgresRepository(h.Postgres)
-	todoCommandService := todocommand.NewTodoCommandService(todoPostgresRepository)
-	todoCommandUsecase := todocommand.NewTodoCommandUsecase(todoCommandService)
-	todoQueryService := todoquery.NewTodoQueryService(todoPostgresRepository)
-	todoQueryUsecase := todoquery.NewTodoQueryUsecase(todoQueryService)
-	todoChecker := tododelivery.NewTodoChecker()
-	todoWrapper := tododelivery.NewTodoWrapper()
-	todoHandler := tododelivery.NewTodoHandler(todoCommandUsecase, todoQueryUsecase, todoChecker, todoWrapper)
-	todoRouter := tododelivery.NewTodoRouter(h.Echo, todoHandler)
-
 	userPostgresRepository := userpersistence.NewUserPostgresRepository(h.Postgres)
 	userCommandService := usercommand.NewUserCommandService(userPostgresRepository)
 	userCommandUsecase := usercommand.NewUserCommandUsecase(userCommandService)
@@ -111,7 +97,6 @@ func (h *HTTP) Set() error {
 	postRouter.Resource()
 	profileRouter.Resource()
 	tagRouter.Resource()
-	todoRouter.Resource()
 	userRouter.Resource()
 
 	return nil
