@@ -14,10 +14,7 @@ type LoggerMiddleware struct {
 	Logger *logrus.Logger
 }
 
-func NewLoggerMiddleware(
-	config *config.Config,
-	logger *logrus.Logger,
-) LoggerMiddleware {
+func NewLoggerMiddleware(config *config.Config, logger *logrus.Logger) LoggerMiddleware {
 	return LoggerMiddleware{
 		Config: config,
 		Logger: logger,
@@ -36,19 +33,23 @@ func (l LoggerMiddleware) WithConfig() echo.MiddlewareFunc {
 			status := values.Status
 			latency := values.Latency.Nanoseconds()
 
-			switch {
-			case status >= http.StatusOK && status < http.StatusMultipleChoices:
-				l.Logger.Infof("request: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
-			case status >= http.StatusMultipleChoices && status < http.StatusBadRequest:
-				l.Logger.Infof("request [redirect]: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
-			case status >= http.StatusBadRequest && status < http.StatusInternalServerError:
-				l.Logger.Warnf("client error: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
-			case status >= http.StatusInternalServerError:
-				l.Logger.Errorf("server error: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
-			default:
-				l.Logger.Infof("request: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
-			}
+			l.LogRequest(method, uri, status, latency)
 			return nil
 		},
 	})
+}
+
+func (l LoggerMiddleware) LogRequest(method, uri string, status int, latency int64) {
+	switch {
+	case status >= http.StatusOK && status < http.StatusMultipleChoices:
+		l.Logger.Infof("request: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
+	case status >= http.StatusMultipleChoices && status < http.StatusBadRequest:
+		l.Logger.Infof("request [redirect]: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
+	case status >= http.StatusBadRequest && status < http.StatusInternalServerError:
+		l.Logger.Warnf("client error: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
+	case status >= http.StatusInternalServerError:
+		l.Logger.Errorf("server error: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
+	default:
+		l.Logger.Infof("request: method=%s uri=%s status=%d latency=%dns", method, uri, status, latency)
+	}
 }
