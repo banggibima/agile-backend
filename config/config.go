@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -48,6 +50,11 @@ type JWT struct {
 }
 
 func Load() (*Config, error) {
+	err := godotenv.Load()
+	if err != nil && os.Getenv("APP_ENV") == "development" {
+		return nil, err
+	}
+
 	config := &Config{
 		App: App{
 			Name:  os.Getenv("APP_NAME"),
