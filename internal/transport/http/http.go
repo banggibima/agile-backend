@@ -3,6 +3,7 @@ package http
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 
 	"github.com/banggibima/agile-backend/config"
 	profilecommand "github.com/banggibima/agile-backend/internal/module/profile/application/command"
@@ -65,6 +66,11 @@ func (h *HTTP) Set() error {
 
 	h.Echo.Use(loggerMiddleware.WithConfig())
 	h.Echo.Use(corsMiddleware.WithConfig())
+	h.Echo.GET("/", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"message": "http server is already running",
+		})
+	})
 
 	profileRouter.Resource()
 	userRouter.Resource()
