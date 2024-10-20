@@ -28,9 +28,6 @@ func (c CORSMiddleware) BuildCORSConfig() middleware.CORSConfig {
 }
 
 func (c CORSMiddleware) GetAllowedOrigins() []string {
-	if len(c.Config.App.Env) > 0 && c.Config.App.Env == "production" {
-		return []string{"https://example.com"}
-	}
 	return []string{"*"}
 }
 

@@ -6,16 +6,10 @@ import (
 	"github.com/banggibima/agile-backend/pkg/echo"
 	"github.com/banggibima/agile-backend/pkg/logrus"
 	"github.com/banggibima/agile-backend/pkg/postgres"
-	"github.com/banggibima/agile-backend/pkg/viper"
 )
 
 func main() {
-	v, err := viper.Init()
-	if err != nil {
-		panic(err)
-	}
-
-	config, err := config.Load(v)
+	config, err := config.Load()
 	if err != nil {
 		panic(err)
 	}

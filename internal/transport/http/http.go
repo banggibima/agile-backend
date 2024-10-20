@@ -5,18 +5,10 @@ import (
 	"fmt"
 
 	"github.com/banggibima/agile-backend/config"
-	postcommand "github.com/banggibima/agile-backend/internal/module/post/application/command"
-	postquery "github.com/banggibima/agile-backend/internal/module/post/application/query"
-	postdelivery "github.com/banggibima/agile-backend/internal/module/post/delivery"
-	postpersistence "github.com/banggibima/agile-backend/internal/module/post/infrastructure/persistence"
 	profilecommand "github.com/banggibima/agile-backend/internal/module/profile/application/command"
 	profilequery "github.com/banggibima/agile-backend/internal/module/profile/application/query"
 	profiledelivery "github.com/banggibima/agile-backend/internal/module/profile/delivery"
 	profilepersistence "github.com/banggibima/agile-backend/internal/module/profile/infrastructure/persistence"
-	tagcommand "github.com/banggibima/agile-backend/internal/module/tag/application/command"
-	tagquery "github.com/banggibima/agile-backend/internal/module/tag/application/query"
-	tagdelivery "github.com/banggibima/agile-backend/internal/module/tag/delivery"
-	tagpersistence "github.com/banggibima/agile-backend/internal/module/tag/infrastructure/persistence"
 	usercommand "github.com/banggibima/agile-backend/internal/module/user/application/command"
 	userquery "github.com/banggibima/agile-backend/internal/module/user/application/query"
 	userdelivery "github.com/banggibima/agile-backend/internal/module/user/delivery"
@@ -48,16 +40,6 @@ func NewHTTP(
 }
 
 func (h *HTTP) Set() error {
-	postPostgresRepository := postpersistence.NewPostPostgresRepository(h.Postgres)
-	postCommandService := postcommand.NewPostCommandService(postPostgresRepository)
-	postCommandUsecase := postcommand.NewPostCommandUsecase(postCommandService)
-	postQueryService := postquery.NewPostQueryService(postPostgresRepository)
-	postQueryUsecase := postquery.NewPostQueryUsecase(postQueryService)
-	postChecker := postdelivery.NewPostChecker()
-	postWrapper := postdelivery.NewPostWrapper()
-	postHandler := postdelivery.NewPostHandler(postCommandUsecase, postQueryUsecase, postChecker, postWrapper)
-	postRouter := postdelivery.NewPostRouter(h.Echo, postHandler)
-
 	profilePostgresRepository := profilepersistence.NewProfilePostgresRepository(h.Postgres)
 	profileCommandService := profilecommand.NewProfileCommandService(profilePostgresRepository)
 	profileCommandUsecase := profilecommand.NewProfileCommandUsecase(profileCommandService)
@@ -67,16 +49,6 @@ func (h *HTTP) Set() error {
 	profileWrapper := profiledelivery.NewProfileWrapper()
 	profileHandler := profiledelivery.NewProfileHandler(profileCommandUsecase, profileQueryUsecase, profileChecker, profileWrapper)
 	profileRouter := profiledelivery.NewProfileRouter(h.Echo, profileHandler)
-
-	tagPostgresRepository := tagpersistence.NewTagPostgresRepository(h.Postgres)
-	tagCommandService := tagcommand.NewTagCommandService(tagPostgresRepository)
-	tagCommandUsecase := tagcommand.NewTagCommandUsecase(tagCommandService)
-	tagQueryService := tagquery.NewTagQueryService(tagPostgresRepository)
-	tagQueryUsecase := tagquery.NewTagQueryUsecase(tagQueryService)
-	tagChecker := tagdelivery.NewTagChecker()
-	tagWrapper := tagdelivery.NewTagWrapper()
-	tagHandler := tagdelivery.NewTagHandler(tagCommandUsecase, tagQueryUsecase, tagChecker, tagWrapper)
-	tagRouter := tagdelivery.NewTagRouter(h.Echo, tagHandler)
 
 	userPostgresRepository := userpersistence.NewUserPostgresRepository(h.Postgres)
 	userCommandService := usercommand.NewUserCommandService(userPostgresRepository)
@@ -94,9 +66,7 @@ func (h *HTTP) Set() error {
 	h.Echo.Use(loggerMiddleware.WithConfig())
 	h.Echo.Use(corsMiddleware.WithConfig())
 
-	postRouter.Resource()
 	profileRouter.Resource()
-	tagRouter.Resource()
 	userRouter.Resource()
 
 	return nil
@@ -107,7 +77,7 @@ func (h *HTTP) Start() error {
 		return err
 	}
 
-	port := fmt.Sprintf(":%d", h.Config.App.Port)
+	port := fmt.Sprintf(":%s", h.Config.App.Port)
 	starter := fmt.Sprintf("http server started on [::]:%s", port)
 
 	h.Logger.Infof(starter)
