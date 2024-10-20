@@ -1,7 +1,9 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -9,25 +11,22 @@ type Config struct {
 	Postgres Postgres
 	Redis    Redis
 	JWT      JWT
-	Minio    Minio
-	Mongo    Mongo
-	RabbitMQ RabbitMQ
 }
 
 type App struct {
 	Name  string
 	Env   string
 	Key   string
-	Debug bool
+	Debug string
 	Host  string
-	Port  int
+	Port  string
 }
 
 type Postgres struct {
 	Driver   string
 	URL      string
 	Host     string
-	Port     int
+	Port     string
 	Username string
 	Password string
 	Database string
@@ -38,78 +37,56 @@ type Redis struct {
 	URL      string
 	Host     string
 	Password string
-	Port     int
+	Port     string
 }
 
 type JWT struct {
 	AccessSecret  string
-	AccessExpire  int
+	AccessExpire  string
 	RefreshSecret string
-	RefreshExpire int
+	RefreshExpire string
 	Audience      string
 	Issuer        string
 }
 
-type Minio struct {
-	Endpoint        string
-	AccessKeyID     string
-	SecretAccessKey string
-	UseSSL          bool
-}
+func Load() (*Config, error) {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 
-type Mongo struct {
-	URL string
-}
-
-type RabbitMQ struct {
-	URL string
-}
-
-func Load(v *viper.Viper) (*Config, error) {
 	config := &Config{
 		App: App{
-			Name:  v.GetString("APP_NAME"),
-			Env:   v.GetString("APP_ENV"),
-			Key:   v.GetString("APP_KEY"),
-			Debug: v.GetBool("APP_DEBUG"),
-			Host:  v.GetString("APP_HOST"),
-			Port:  v.GetInt("APP_PORT"),
+			Name:  os.Getenv("APP_NAME"),
+			Env:   os.Getenv("APP_ENV"),
+			Key:   os.Getenv("APP_KEY"),
+			Debug: os.Getenv("APP_DEBUG"),
+			Host:  os.Getenv("APP_HOST"),
+			Port:  os.Getenv("APP_PORT"),
 		},
 		Postgres: Postgres{
-			Driver:   v.GetString("POSTGRES_DRIVER"),
-			URL:      v.GetString("POSTGRES_URL"),
-			Host:     v.GetString("POSTGRES_HOST"),
-			Port:     v.GetInt("POSTGRES_PORT"),
-			Username: v.GetString("POSTGRES_USERNAME"),
-			Password: v.GetString("POSTGRES_PASSWORD"),
-			Database: v.GetString("POSTGRES_DATABASE"),
-			SSLMode:  v.GetString("POSTGRES_SSLMODE"),
+			Driver:   os.Getenv("POSTGRES_DRIVER"),
+			URL:      os.Getenv("POSTGRES_URL"),
+			Host:     os.Getenv("POSTGRES_HOST"),
+			Port:     os.Getenv("POSTGRES_PORT"),
+			Username: os.Getenv("POSTGRES_USERNAME"),
+			Password: os.Getenv("POSTGRES_PASSWORD"),
+			Database: os.Getenv("POSTGRES_DATABASE"),
+			SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
 		},
 		Redis: Redis{
-			URL:      v.GetString("REDIS_URL"),
-			Host:     v.GetString("REDIS_HOST"),
-			Password: v.GetString("REDIS_PASSWORD"),
-			Port:     v.GetInt("REDIS_PORT"),
+			URL:      os.Getenv("REDIS_URL"),
+			Host:     os.Getenv("REDIS_HOST"),
+			Password: os.Getenv("REDIS_PASSWORD"),
+			Port:     os.Getenv("REDIS_PORT"),
 		},
 		JWT: JWT{
-			AccessSecret:  v.GetString("JWT_ACCESS_SECRET"),
-			AccessExpire:  v.GetInt("JWT_ACCESS_EXPIRE"),
-			RefreshSecret: v.GetString("JWT_REFRESH_SECRET"),
-			RefreshExpire: v.GetInt("JWT_REFRESH_EXPIRE"),
-			Audience:      v.GetString("JWT_AUDIENCE"),
-			Issuer:        v.GetString("JWT_ISSUER"),
-		},
-		Minio: Minio{
-			Endpoint:        v.GetString("MINIO_ENDPOINT"),
-			AccessKeyID:     v.GetString("MINIO_ACCESS_KEY_ID"),
-			SecretAccessKey: v.GetString("MINIO_SECRET_ACCESS_KEY"),
-			UseSSL:          v.GetBool("MINIO_USE_SSL"),
-		},
-		Mongo: Mongo{
-			URL: v.GetString("MONGO_URL"),
-		},
-		RabbitMQ: RabbitMQ{
-			URL: v.GetString("RABBITMQ_URL"),
+			AccessSecret:  os.Getenv("JWT_ACCESS_SECRET"),
+			AccessExpire:  os.Getenv("JWT_ACCESS_EXPIRE"),
+			RefreshSecret: os.Getenv("JWT_REFRESH_SECRET"),
+			RefreshExpire: os.Getenv("JWT_REFRESH_EXPIRE"),
+			Audience:      os.Getenv("JWT_AUDIENCE"),
+			Issuer:        os.Getenv("JWT_ISSUER"),
 		},
 	}
 
